@@ -1,5 +1,6 @@
 package com.entropicapps.deeplistener;
 
+import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,13 +20,8 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    double FIRST_VALUE = 0;
-    double NEXT_VALUE = 0;
-    double DIFFERENCE = 0;
     int threshold;
-
-    final Handler mHandler = new Handler();
-    final SoundMeter recorder = new SoundMeter();
+    int interval;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,22 +33,16 @@ public class MainActivity extends AppCompatActivity {
         final Button btStop = (Button) findViewById(R.id.btStop);
         btStop.setEnabled(false);
         final SeekBar barThreshold = (SeekBar) findViewById(R.id.sbarThreshold);
+        final SeekBar barInterval = (SeekBar) findViewById(R.id.sbarInterval);
 
         btStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recorder.start();
                 btStop.setEnabled(true);
                 btStart.setEnabled(false);
                 threshold = barThreshold.getProgress();
-
-                Timer mTimer = new Timer();
-                mTimer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        updateTV();
-                    }
-                }, 0, 1000);
+                interval = barInterval.getProgress();
+                startService();
 
             }
         });
@@ -60,34 +50,28 @@ public class MainActivity extends AppCompatActivity {
         btStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recorder.stop();
                 btStop.setEnabled(false);
                 btStart.setEnabled(true);
+                stopService();
             }
         });
 
     }
 
-    private void updateTV() {
-        //Update amplitude here
-        FIRST_VALUE = recorder.getAmplitude();
-        mHandler.post(mRunnable);
+    public void startService() {
+        //startService(new Intent(getBaseContext(), MainService.class).putExtra("threshold", threshold));
+        Intent intent = new Intent(getBaseContext(), MainService.class);
+        Bundle extras = new Bundle();
+        extras.putInt("threshold", threshold);
+        extras.putInt("interval", interval);
+        intent.putExtras(extras);
+        startService(intent);
+
     }
 
-    final Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            TextView tvDebug = (TextView) findViewById(R.id.tvDebug);
-            DIFFERENCE = FIRST_VALUE - NEXT_VALUE;
-            NEXT_VALUE = FIRST_VALUE;
-            tvDebug.setText(String.valueOf(DIFFERENCE));
-
-            if (DIFFERENCE >= threshold) {
-                Toast.makeText(getApplicationContext(), "Threshold exceeded", Toast.LENGTH_SHORT).show();
-            }
-
-        }
-    };
+    public void stopService() {
+        stopService(new Intent(getBaseContext(), MainService.class));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
