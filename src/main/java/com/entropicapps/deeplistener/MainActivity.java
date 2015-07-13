@@ -8,7 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -17,8 +19,11 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    double ampValue;
-    //TextView tvDebug;
+    double FIRST_VALUE = 0;
+    double NEXT_VALUE = 0;
+    double DIFFERENCE = 0;
+    int threshold;
+
     final Handler mHandler = new Handler();
     final SoundMeter recorder = new SoundMeter();
 
@@ -31,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         final Button btStart = (Button) findViewById(R.id.btStart);
         final Button btStop = (Button) findViewById(R.id.btStop);
         btStop.setEnabled(false);
-
+        final SeekBar barThreshold = (SeekBar) findViewById(R.id.sbarThreshold);
 
         btStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,21 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 recorder.start();
                 btStop.setEnabled(true);
                 btStart.setEnabled(false);
-
-                /*
-                double amp = -1;
-                amp = recorder.getAmplitude();
-                tvDebug.setText(String.valueOf(amp));
-                // Execute code after 0.5 seconds have passed
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        double newAmp = -2;
-                        newAmp = recorder.getAmplitude();
-                        tvDebug.setText(String.valueOf(newAmp));
-                    }
-                }, 500);
-                */
+                threshold = barThreshold.getProgress();
 
                 Timer mTimer = new Timer();
                 mTimer.schedule(new TimerTask() {
@@ -79,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateTV() {
         //Update amplitude here
-        ampValue = recorder.getAmplitude();
+        FIRST_VALUE = recorder.getAmplitude();
         mHandler.post(mRunnable);
     }
 
@@ -87,7 +78,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             TextView tvDebug = (TextView) findViewById(R.id.tvDebug);
-            tvDebug.setText(String.valueOf(ampValue));
+            DIFFERENCE = FIRST_VALUE - NEXT_VALUE;
+            NEXT_VALUE = FIRST_VALUE;
+            tvDebug.setText(String.valueOf(DIFFERENCE));
+
+            if (DIFFERENCE >= threshold) {
+                Toast.makeText(getApplicationContext(), "Threshold exceeded", Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

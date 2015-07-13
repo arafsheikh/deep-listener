@@ -9,8 +9,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Sensitivity"
-        android:id="@+id/tvSensitivity"
+        android:text="Update Interval"
+        android:id="@+id/tvInterval"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -18,15 +18,15 @@
     <SeekBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/sbarSensitivity"
+        android:id="@+id/sbarInterval"
         android:layout_alignParentTop="true"
         android:layout_marginTop="20dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:progress="20"
-        android:max="100" />
+        android:progress="500"
+        android:max="2000" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Threshold"
         android:id="@+id/tvThreshold"
-        android:layout_below="@+id/sbarSensitivity"
+        android:layout_below="@+id/sbarInterval"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="30dp" />
@@ -42,14 +42,14 @@
     <SeekBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/seekBar"
+        android:id="@+id/sbarThreshold"
         android:layout_below="@+id/tvThreshold"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/sbarSensitivity"
-        android:layout_alignEnd="@+id/sbarSensitivity"
-        android:max="100"
-        android:progress="8" />
+        android:layout_alignRight="@+id/sbarInterval"
+        android:layout_alignEnd="@+id/sbarInterval"
+        android:max="50000"
+        android:progress="20000" />
 
     <Button
         android:layout_width="wrap_content"
