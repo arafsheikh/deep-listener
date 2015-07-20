@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 btStop.setEnabled(true);
                 btStart.setEnabled(false);
-                threshold = barThreshold.getProgress();
-                interval = barInterval.getProgress();
+                threshold = barThreshold.getProgress() + 50;
+                interval = barInterval.getProgress() + 50;
                 startService();
 
             }
