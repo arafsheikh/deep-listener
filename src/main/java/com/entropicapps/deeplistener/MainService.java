@@ -4,21 +4,14 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.view.KeyEvent;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainService extends Service {
-    public MainService() {
-    }
-
     final SoundMeter recorder = new SoundMeter();
     final Handler mHandler = new Handler();
     double FIRST_VALUE = 0;
@@ -28,6 +21,29 @@ public class MainService extends Service {
     int interval;
     AudioManager am;
     AudioManager.OnAudioFocusChangeListener af;
+    final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            DIFFERENCE = FIRST_VALUE - NEXT_VALUE;
+            NEXT_VALUE = FIRST_VALUE;
+
+            if (DIFFERENCE >= threshold) {
+                //Toast.makeText(getApplicationContext(), "Threshold exceeded", Toast.LENGTH_SHORT).show();
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(200);
+
+                am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                int request = am.requestAudioFocus(af,
+                        AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN);
+
+            }
+
+        }
+    };
+
+    public MainService() {
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -40,7 +56,7 @@ public class MainService extends Service {
 
         af = new AudioManager.OnAudioFocusChangeListener() {
             public void onAudioFocusChange(int focusChange) {
-                if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
+                if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
                     // Lower the volume
                 } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
                     // Raise it back to normal
@@ -68,27 +84,6 @@ public class MainService extends Service {
         FIRST_VALUE = recorder.getAmplitude();
         mHandler.post(mRunnable);
     }
-
-    final Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            DIFFERENCE = FIRST_VALUE - NEXT_VALUE;
-            NEXT_VALUE = FIRST_VALUE;
-
-            if (DIFFERENCE >= threshold) {
-                //Toast.makeText(getApplicationContext(), "Threshold exceeded", Toast.LENGTH_SHORT).show();
-                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(400);
-
-                am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-                int request = am.requestAudioFocus(af,
-                        AudioManager.STREAM_MUSIC,
-                        AudioManager.AUDIOFOCUS_GAIN);
-
-            }
-
-        }
-    };
 
     @Override
     public void onDestroy() {
